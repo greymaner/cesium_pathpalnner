@@ -33,6 +33,37 @@ function calcPointInLineWithY(p1, p2, y, x1, x2){
     return point;
 }
 
+function calcPointInLineWith2point(p1, p2, p3, p4){
+    var a1 = p2[1] - p1[1]
+    var b1 = p1[0] - p2[0]
+    var c1 = p1[0]*p2[1]-p2[0]*p1[1]
+    var a2 = p4[1] - p3[1]
+    var b2 = p3[0] - p4[0]
+    var c2 = p3[0]*p4[1]-p4[0]*p3[1]
+    var det = a1*b2-a2*b1
+    if (det==0){
+        return false
+    }
+        
+    var x = (c1*b2-c2*b1)/det
+    var y = (a1*c2-a2*c1)/det
+    var point = [x, y]
+    var lineY2 = p2[1]
+    var lineY1 = p1[1]
+    var lineX2 = p2[0]
+    var lineX1 = p1[0]
+    var pointX = point[0]
+    var pointY = point[1]
+    var cross1 = (lineX2 - lineX1) * (pointX - lineX1) + (lineY2 - lineY1) * (pointY - lineY1)
+    var cross2 = (lineX1 - lineX2) * (pointX - lineX2) + (lineY1 - lineY2) * (pointY - lineY2)
+    if (cross1 < 0 || cross2 < 0){
+        return false
+    }
+        
+    return point
+}
+    
+
 function outbound_box(point,duration){
     var max_x = -99999;
     var max_y = -99999;
@@ -517,3 +548,4 @@ function add_flight_point(point,zpoint,duration,rotate){
     finaline1 = rotation_polygon(finaline, rect, rotate);
     return finaline1;
 }
+

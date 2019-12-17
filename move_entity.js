@@ -28,6 +28,96 @@ var MoveEntity = (
 
             // Release plane on mouse up
             handler.setInputAction(function (movement) {
+                pointDraged = viewer.scene.pick(movement.position);//选取当前的entity 
+                if(pointDraged.id){
+                    console.log(pointDraged.id.name)
+
+                }
+                leftDownFlag = true;
+                if (pointDraged.id) {
+                    viewer.scene.screenSpaceCameraController.enableRotate = false;//锁定相机
+                }
+                else if(pointDraged.id == null){
+                    viewer.scene.screenSpaceCameraController.enableRotate = true;
+                }
+            }, Cesium.ScreenSpaceEventType.RIGHT_DOWN);
+            handler.setInputAction(function(wheelment){
+                try{
+                    if (pointDraged.id) {
+                        viewer.scene.screenSpaceCameraController.enableZoom = false;//锁定相机
+                    }
+                    else{
+                        viewer.scene.screenSpaceCameraController.enableZoom = true;
+                    }
+                }
+                catch(err){
+                    viewer.scene.screenSpaceCameraController.enableZoom = true;
+                }
+                
+                
+                if(pointDraged.id.name.substring(0,5) =="Green"){
+                    var numArr = pointDraged.id.name.match(/\d+/g)
+                    num = parseInt(numArr)
+                    console.log(num)
+                    
+                    heightpp = parseInt(wheelment)/100
+                    scanline[num+2] += heightpp
+                    myrepaint()
+                    myrepaintentity()
+                }
+                if(pointDraged.id.name.substring(0,5) =="Yello"){
+                    var numArr = pointDraged.id.name.match(/\d+/g)
+                    num = parseInt(numArr)
+                    console.log(num)
+                    
+                    heightpp = parseInt(wheelment)/100
+                    bianjiepoint[num][2] += heightpp
+                    fuzhuo()
+                    myrepaint()
+                    myrepaintentity()
+                }
+                if(pointDraged.id.name.substring(0,5) =="Black"){
+                    var numArr = pointDraged.id.name.match(/\d+/g)
+                    num = parseInt(numArr)
+                    console.log(num)
+                    
+                    heightpp = parseInt(wheelment)/100
+                    zhangaipoint[num][2] += heightpp
+                    fuzhuo()
+                    myrepaint()
+                    myrepaintentity()
+                }
+                if(pointDraged.id.name.substring(0,5) =="jixia"){
+                    var numArr = pointDraged.id.name.match(/\d+/g)
+                    num = parseInt(numArr)
+                    console.log(num)
+                    
+                    heightpp = parseInt(wheelment)/100
+                    jixian[num][2] += heightpp
+                    calculate_zhexian()
+                    myrepaint()
+                    myrepaintentity()
+                }
+                if(pointDraged.id.name.substring(0,5) =="zhunx"){
+                    var numArr = pointDraged.id.name.match(/\d+/g)
+                    num = parseInt(numArr)
+                    console.log(num)
+                    
+                    heightpp = parseInt(wheelment)/100
+                    zhunxian[num][2] += heightpp
+                    calculate_zhexian()
+                    myrepaint()
+                    myrepaintentity()
+                }
+                if(pointDraged.id.name.substring(0,5) =="xiush"){
+                    
+                    myrepaint()
+                    myrepaintentity()
+                }
+
+            },Cesium.ScreenSpaceEventType.WHEEL);
+
+            handler.setInputAction(function (movement) {
                 if (leftDownFlag === true && pointDraged.id != null) {
                     // let ray = viewer.camera.getPickRay(movement.endPosition);
                     let cartesian = viewer.scene.pickPosition(movement.position);
@@ -40,44 +130,12 @@ var MoveEntity = (
                         var lat = Cesium.Math.toDegrees(cartographic.latitude); //根据弧度获取到纬度
                         var height = cartographic.height;//模型高度
                         var point = [lng,lat,height];
-                        var pp1point = [point[0], point[1], point[2]+heightplus]
+                        var pp1point = [point[0], point[1], point[2]]
                         bianjiepoint[num] = pp1point
                         wallpoint[num*3] = point[0]
                         wallpoint[num*3+1] = point[1]
                         wallpoint[num*3+2] = point[2]+heightplus
-                        scanpath = add_flight_point(bianjiepoint,zds,0.0001,anglerotationval);
-                        // console.log(scanpath)
-                        scanline = [];
-                        
-                        for(var yy=0;yy<scanpath.length;yy++){
-                            var mindis = 999999
-                            var mindisi = 0
-                            for(var zz=0;zz<bianjiepoint.length;zz++){
-                                var lineY2=bianjiepoint[sii(zz+1,bianjiepoint.length)][1];
-                                var lineY1=bianjiepoint[zz][1];
-                                var lineX2=bianjiepoint[sii(zz+1,bianjiepoint.length)][0];
-                                var lineX1=bianjiepoint[zz][0];
-                                var pointX=scanpath[yy][0];
-                                var pointY=scanpath[yy][1];
-                                var a = lineY2 - lineY1;
-                                var b = lineX1 - lineX2;
-                                var c = lineX2 * lineY1 - lineX1 * lineY2;
-                                var dis = (Math.abs(a * pointX + b * pointY + c)) / (Math.pow(a * a + b * b, 0.5));
-                                var cross1 = (lineX2-lineX1)*(pointX-lineX1) + (lineY2-lineY1)*(pointY-lineY1);
-                                var cross2 = (lineX1-lineX2)*(pointX-lineX2) + (lineY1-lineY2)*(pointY-lineY2);
-                                if(dis<mindis && cross1 >0 &&cross2>0){
-                                    mindis = dis;
-                                    mindisi =zz;
-                                }
-                            }
-                            var distTozz = Math.sqrt(Math.pow(scanpath[yy][0]-bianjiepoint[mindisi][0],2)+Math.pow(scanpath[yy][1]-bianjiepoint[mindisi][1],2));
-                            var distzz1Tozz = Math.sqrt(Math.pow(bianjiepoint[sii(mindisi+1,bianjiepoint.length)][0]-bianjiepoint[mindisi][0],2)+Math.pow(bianjiepoint[sii(mindisi+1,bianjiepoint.length)][1]-bianjiepoint[mindisi][1],2));
-                            var heightdif = bianjiepoint[sii(mindisi+1,bianjiepoint.length)][2]-bianjiepoint[mindisi][2];
-                            var heightmid = (distTozz/distzz1Tozz)*heightdif + bianjiepoint[mindisi][2];
-                            scanline.push(scanpath[yy][0]);
-                            scanline.push(scanpath[yy][1]);
-                            scanline.push(heightmid);
-                        }
+                        fuzhuo()
                         myrepaint()
                         myrepaintentity()
                     }
@@ -90,44 +148,12 @@ var MoveEntity = (
                         var lat = Cesium.Math.toDegrees(cartographic.latitude); //根据弧度获取到纬度
                         var height = cartographic.height;//模型高度
                         var point = [lng,lat,height];
-                        var pp1point = [point[0], point[1], point[2]+heightplus]
+                        var pp1point = [point[0], point[1], point[2]]
                         zhangaipoint[num] = pp1point
                         zhangaiwall[num*3] = point[0]
                         zhangaiwall[num*3+1] = point[1]
                         zhangaiwall[num*3+2] = point[2]+heightplus
-                        scanpath = add_flight_point(bianjiepoint,zds,0.0001,anglerotationval);
-                        // console.log(scanpath)
-                        scanline = [];
-                        
-                        for(var yy=0;yy<scanpath.length;yy++){
-                            var mindis = 999999
-                            var mindisi = 0
-                            for(var zz=0;zz<bianjiepoint.length;zz++){
-                                var lineY2=bianjiepoint[sii(zz+1,bianjiepoint.length)][1];
-                                var lineY1=bianjiepoint[zz][1];
-                                var lineX2=bianjiepoint[sii(zz+1,bianjiepoint.length)][0];
-                                var lineX1=bianjiepoint[zz][0];
-                                var pointX=scanpath[yy][0];
-                                var pointY=scanpath[yy][1];
-                                var a = lineY2 - lineY1;
-                                var b = lineX1 - lineX2;
-                                var c = lineX2 * lineY1 - lineX1 * lineY2;
-                                var dis = (Math.abs(a * pointX + b * pointY + c)) / (Math.pow(a * a + b * b, 0.5));
-                                var cross1 = (lineX2-lineX1)*(pointX-lineX1) + (lineY2-lineY1)*(pointY-lineY1);
-                                var cross2 = (lineX1-lineX2)*(pointX-lineX2) + (lineY1-lineY2)*(pointY-lineY2);
-                                if(dis<mindis && cross1 >0 &&cross2>0){
-                                    mindis = dis;
-                                    mindisi =zz;
-                                }
-                            }
-                            var distTozz = Math.sqrt(Math.pow(scanpath[yy][0]-bianjiepoint[mindisi][0],2)+Math.pow(scanpath[yy][1]-bianjiepoint[mindisi][1],2));
-                            var distzz1Tozz = Math.sqrt(Math.pow(bianjiepoint[sii(mindisi+1,bianjiepoint.length)][0]-bianjiepoint[mindisi][0],2)+Math.pow(bianjiepoint[sii(mindisi+1,bianjiepoint.length)][1]-bianjiepoint[mindisi][1],2));
-                            var heightdif = bianjiepoint[sii(mindisi+1,bianjiepoint.length)][2]-bianjiepoint[mindisi][2];
-                            var heightmid = (distTozz/distzz1Tozz)*heightdif + bianjiepoint[mindisi][2];
-                            scanline.push(scanpath[yy][0]);
-                            scanline.push(scanpath[yy][1]);
-                            scanline.push(heightmid);
-                        }
+                        fuzhuo()
                         myrepaint()
                         myrepaintentity()
                     }
@@ -145,7 +171,59 @@ var MoveEntity = (
                         scanline[num+2] = point[2]+heightplus
                         myrepaint()
                         myrepaintentity()
-                }
+                    }
+                    if(pointDraged.id.name.substring(0,5) =="jixia"){
+                        var numArr = pointDraged.id.name.match(/\d+/g)
+                        num = parseInt(numArr)
+                        console.log(num)
+                        var cartographic = Cesium.Cartographic.fromCartesian(cartesian); //根据笛卡尔坐标获取到弧度
+                        var lng = Cesium.Math.toDegrees(cartographic.longitude); //根据弧度获取到经度
+                        var lat = Cesium.Math.toDegrees(cartographic.latitude); //根据弧度获取到纬度
+                        var height = cartographic.height;//模型高度
+                        var point = [lng,lat,height];
+                        var pp1point = [point[0], point[1], point[2]]
+                        jixian[num] = pp1point
+                        jixianwall[num*3] = point[0]
+                        jixianwall[num*3+1] = point[1]
+                        jixianwall[num*3+2] = point[2]+heightplus
+                        calculate_zhexian()
+                        myrepaint()
+                        myrepaintentity()
+                    }
+                    if(pointDraged.id.name.substring(0,5) =="zhunx"){
+                        var numArr = pointDraged.id.name.match(/\d+/g)
+                        num = parseInt(numArr)
+                        console.log(num)
+                        var cartographic = Cesium.Cartographic.fromCartesian(cartesian); //根据笛卡尔坐标获取到弧度
+                        var lng = Cesium.Math.toDegrees(cartographic.longitude); //根据弧度获取到经度
+                        var lat = Cesium.Math.toDegrees(cartographic.latitude); //根据弧度获取到纬度
+                        var height = cartographic.height;//模型高度
+                        var point = [lng,lat,height];
+                        var pp1point = [point[0], point[1], point[2]]
+                        zhunxian[num] = pp1point
+                        zhunxianwall[num*3] = point[0]
+                        zhunxianwall[num*3+1] = point[1]
+                        zhunxianwall[num*3+2] = point[2]+heightplus
+                        calculate_zhexian()
+                        myrepaint()
+                        myrepaintentity()
+                    }
+                    if(pointDraged.id.name.substring(0,5) =="xiush"){
+                        var numArr = pointDraged.id.name.match(/\d+/g)
+                        num = parseInt(numArr)
+                        console.log(num)
+                        var cartographic = Cesium.Cartographic.fromCartesian(cartesian); //根据笛卡尔坐标获取到弧度
+                        var lng = Cesium.Math.toDegrees(cartographic.longitude); //根据弧度获取到经度
+                        var lat = Cesium.Math.toDegrees(cartographic.latitude); //根据弧度获取到纬度
+                        var height = cartographic.height;//模型高度
+                        var point = [lng,lat,height];
+                        var pp1point = [point[0], point[1], point[2]]
+                        xiushi[num] = pp1point
+                        
+                        calculate_zhexian()
+                        myrepaint()
+                        myrepaintentity()
+                    }
             }
 
                 leftDownFlag = false;
@@ -171,3 +249,4 @@ var MoveEntity = (
         }
         return ConstructMoveEntity;
     })();
+

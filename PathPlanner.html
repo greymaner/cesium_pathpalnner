@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Path Planner</title>
+  <script src="/Build/Cesium/Cesium.js"></script>
+  <style>
+      @import url(/Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: auto;
+      }
+  </style>
+</head>
+<body>
+  
+  
+  <label for='sel-opt'>改变点类型</label> 
+  <select id="sel-opt"> 
+      <option value="1" >边界点</option>
+      <option value="2" >障碍点</option>
+      <option value="3" >航点</option>
+      <option value="4" >曲线基线点</option>
+      <option value="5" >曲线准线点</option>
+      <option value="6" >曲线修饰点</option>
+    </select>
+    
+  <label for='value1'>航线方向(度)</label>  
+  <input type="number" id="value1" min="-180" max="180" value="0" onchange="getangle(this.value)">
+  <label for='value3'>扫描航线间距(米)</label>
+  <input type="number" id="value3" min="1" max="20" value="4" onchange="getDuration(this.value)">
+  <label for='value2'>相对地表高度(米)</label>
+  <input type="number" id="value2" min="0" max="100" value="10" onchange="getheight(this.value)">
+  <label for='value4'>曲线航线条数(度)</label>
+  <input type="number" id="value4" min="1" max="100" value="10" onchange="getTiao(this.value)">
+  
+  <button type="button" onclick="clearallpoints()">清空所有标记</button>
+
+  <button type="button" onclick="deletePoint()">删除选中点</button>
+
+  <button type="button" onclick="outputPath()">输出航线文件</button>
+
+
+  <div id="cesiumContainer"></div>
+  <script src='move_entity.js'></script>
+  <script src='path_func.js'></script>
+  <script src='main_func.js'></script>
+
+
+</body>
+</html>

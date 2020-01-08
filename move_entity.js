@@ -40,7 +40,7 @@ var MoveEntity = (
                 else if(pointDraged.id == null){
                     viewer.scene.screenSpaceCameraController.enableRotate = true;
                 }
-            }, Cesium.ScreenSpaceEventType.RIGHT_DOWN);
+            }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
             handler.setInputAction(function(wheelment){
                 try{
                     if (pointDraged.id) {
@@ -61,6 +61,7 @@ var MoveEntity = (
                     console.log(num)
                     
                     heightpp = parseInt(wheelment)/100
+                    scanpath[num/3][3] += heightpp
                     scanline[num+2] += heightpp
                     myrepaint()
                     myrepaintentity()
@@ -172,6 +173,22 @@ var MoveEntity = (
                         myrepaint()
                         myrepaintentity()
                     }
+                    // if(pointDraged.id.name.substring(0,5) =="Greep"){
+                    //     var numArr = pointDraged.id.name.match(/\d+/g)
+                    //     num = parseInt(numArr)
+                    //     console.log(num)
+
+                    //     // var cartographic = Cesium.Cartographic.fromCartesian(cartesian); //根据笛卡尔坐标获取到弧度
+                    //     // var lng = Cesium.Math.toDegrees(cartographic.longitude); //根据弧度获取到经度
+                    //     // var lat = Cesium.Math.toDegrees(cartographic.latitude); //根据弧度获取到纬度
+                    //     // var height = cartographic.height;//模型高度
+                    //     // var point = [lng,lat,height];
+                    //     // scanline[num] = point[0]
+                    //     // scanline[num+1] = point[1]
+                    //     // scanline[num+2] = point[2]+heightplus
+                    //     // myrepaint()
+                    //     // myrepaintentity()
+                    // }
                     if(pointDraged.id.name.substring(0,5) =="jixia"){
                         var numArr = pointDraged.id.name.match(/\d+/g)
                         num = parseInt(numArr)
@@ -232,7 +249,8 @@ var MoveEntity = (
             }, Cesium.ScreenSpaceEventType.LEFT_UP);
             // Update plane on mouse move
             handler.setInputAction(function (movement) {
-                if (leftDownFlag === true && pointDraged.id != null) {
+                //在这判断是否要拖动
+                if (leftDownFlag === true && pointDraged.id != null && pointDraged.id.name.substring(0,5) != "Greep"&& pointDraged.id.name.substring(0,5) != "Blacp"&& pointDraged.id.name.substring(0,5) != "Yellp"&& pointDraged.id.name.substring(0,5) != "jixip"&& pointDraged.id.name.substring(0,5) != "zhunp"&& pointDraged.id.name.substring(0,5) != "xiusp") {
                     // let ray = viewer.camera.getPickRay(movement.endPosition);
                     let cartesian = viewer.scene.pickPosition(movement.endPosition);
                     
@@ -249,4 +267,3 @@ var MoveEntity = (
         }
         return ConstructMoveEntity;
     })();
-
